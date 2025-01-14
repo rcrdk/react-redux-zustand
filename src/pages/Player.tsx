@@ -4,19 +4,23 @@ import { useEffect } from 'react'
 import { Header } from '../components/Header'
 import { Module, ModuleSkeleton } from '../components/Module'
 import { Video } from '../components/Video'
-import { useAppDispatch, useAppSelector } from '../store'
-import { loadCourse, useCurrentLesson } from '../store/slices/player'
+import { useCurrentLesson, useStore } from '../store'
 
 export function Player() {
-	const dispatch = useAppDispatch()
-	const modules = useAppSelector((state) => state.player.course?.modules)
-	const isCourseLoading = useAppSelector((state) => state.player.isLoading)
+	const { course, isLoading, load } = useStore((state) => {
+		return {
+			course: state.course,
+			isLoading: state.isLoading,
+			load: state.load,
+		}
+	})
 
 	const { currentLesson } = useCurrentLesson()
 
 	useEffect(() => {
-		dispatch(loadCourse())
-	}, [dispatch])
+		load()
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	useEffect(() => {
 		if (currentLesson) {
@@ -42,13 +46,13 @@ export function Player() {
 					</div>
 
 					<aside className="divide-y-2 divide-zinc-900 absolute top-0 right-0 bottom-0 overflow-y-scroll w-80 border-l border-zinc-800 bg-zinc-900 scrollbar-thin scrollbar-track-zinc-950 scrollbar-thumb-zinc-800">
-						{isCourseLoading &&
+						{isLoading &&
 							Array.from({ length: 6 }).map((_, i) => (
 								<ModuleSkeleton key={i} />
 							))}
 
-						{modules &&
-							modules.map((item, index) => (
+						{course?.modules &&
+							course.modules.map((item, index) => (
 								<Module
 									key={index}
 									moduleIndex={index}
