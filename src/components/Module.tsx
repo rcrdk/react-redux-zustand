@@ -16,12 +16,14 @@ export function Module({ moduleIndex, title, lessonsAmount }: Props) {
 	const dispach = useDispatch()
 
 	const { currentModuleIndex, currentLessonIndex } = useAppSelector((state) => {
-		return state.player
+		const { currentModuleIndex, currentLessonIndex } = state.player
+
+		return { currentModuleIndex, currentLessonIndex }
 	})
 
-	const lessons = useAppSelector(
-		(state) => state.player.course.modules[moduleIndex].lessons,
-	)
+	const lessons = useAppSelector((state) => {
+		return state.player.course.modules[moduleIndex].lessons
+	})
 
 	return (
 		<Collapsible.Root className="group" defaultOpen={moduleIndex === 0}>
