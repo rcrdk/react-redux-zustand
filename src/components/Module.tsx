@@ -1,8 +1,7 @@
 import * as Collapsible from '@radix-ui/react-collapsible'
 import { ChevronDown } from 'lucide-react'
-import { useDispatch } from 'react-redux'
 
-import { useAppSelector } from '../store'
+import { useAppDispatch, useAppSelector } from '../store'
 import { play } from '../store/slices/player'
 import { Lesson } from './Lesson'
 
@@ -13,7 +12,7 @@ type Props = {
 }
 
 export function Module({ moduleIndex, title, lessonsAmount }: Props) {
-	const dispach = useDispatch()
+	const dispach = useAppDispatch()
 
 	const { currentModuleIndex, currentLessonIndex } = useAppSelector((state) => {
 		const { currentModuleIndex, currentLessonIndex } = state.player
@@ -22,7 +21,7 @@ export function Module({ moduleIndex, title, lessonsAmount }: Props) {
 	})
 
 	const lessons = useAppSelector((state) => {
-		return state.player.course.modules[moduleIndex].lessons
+		return state.player.course?.modules[moduleIndex].lessons
 	})
 
 	return (
@@ -46,20 +45,40 @@ export function Module({ moduleIndex, title, lessonsAmount }: Props) {
 
 			<Collapsible.Content className="data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden">
 				<nav className="relative flex flex-col gap-4 p-6">
-					{lessons.map((item, lessonIndex) => (
-						<Lesson
-							key={item.id}
-							title={item.title}
-							duration={item.duration}
-							isCurrent={
-								currentModuleIndex === moduleIndex &&
-								currentLessonIndex === lessonIndex
-							}
-							onPlay={() => dispach(play([moduleIndex, lessonIndex]))}
-						/>
-					))}
+					{lessons &&
+						lessons.map((item, lessonIndex) => (
+							<Lesson
+								key={item.id}
+								title={item.title}
+								duration={item.duration}
+								isCurrent={
+									currentModuleIndex === moduleIndex &&
+									currentLessonIndex === lessonIndex
+								}
+								onPlay={() => dispach(play([moduleIndex, lessonIndex]))}
+							/>
+						))}
 				</nav>
 			</Collapsible.Content>
 		</Collapsible.Root>
+	)
+}
+
+export function ModuleSkeleton() {
+	return (
+		<div className="flex w-full items-center gap-3 bg-zinc-800 p-4">
+			<div className="size-10 rounded-full bg-zinc-700 animate-pulse" />
+
+			<div className="flex flex-1 items-start flex-col text-left gap-1">
+				<strong className="w-2/3 text-sm text-transparent bg-zinc-700 rounded animate-pulse">
+					Carregando...
+				</strong>
+				<span className="w-1/3 text-xs text-transparent bg-zinc-700 rounded animate-pulse">
+					Carregando...
+				</span>
+			</div>
+
+			<ChevronDown className="size-6 ml-auto text-zinc-700 transition-transform duration-500 group-data-[state=open]:rotate-180" />
+		</div>
 	)
 }
