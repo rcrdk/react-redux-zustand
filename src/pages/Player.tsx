@@ -1,10 +1,21 @@
 import { MessageCircle } from 'lucide-react'
+import { useEffect } from 'react'
 
 import { Header } from '../components/Header'
 import { Module } from '../components/Module'
 import { Video } from '../components/Video'
+import { useAppSelector } from '../store'
+import { useCurrentLesson } from '../store/slices/player'
 
 export function Player() {
+	const modules = useAppSelector((state) => state.player.course.modules)
+
+	const { currentLesson } = useCurrentLesson()
+
+	useEffect(() => {
+		document.title = `${currentLesson.title} – React + Redux + Zustand`
+	}, [currentLesson])
+
 	return (
 		<div className="h-screen bg-zinc-950 text-zinc-50 flex justify-center items-center">
 			<div className="flex w-[1100px] flex-col gap-6">
@@ -23,21 +34,14 @@ export function Player() {
 					</div>
 
 					<aside className="divide-y-2 divide-zinc-900 absolute top-0 right-0 bottom-0 overflow-y-scroll w-80 border-l border-zinc-800 bg-zinc-900 scrollbar-thin scrollbar-track-zinc-950 scrollbar-thumb-zinc-800">
-						<Module
-							moduleIndex={0}
-							title="Desvendando Redux"
-							lessonsAmount={3}
-						/>
-						<Module
-							moduleIndex={1}
-							title="Desvendando Redux"
-							lessonsAmount={3}
-						/>
-						<Module
-							moduleIndex={2}
-							title="Desvendando Redux"
-							lessonsAmount={3}
-						/>
+						{modules.map((item, index) => (
+							<Module
+								key={index}
+								moduleIndex={index}
+								title={item.title}
+								lessonsAmount={item.lessons.length}
+							/>
+						))}
 					</aside>
 				</main>
 			</div>
